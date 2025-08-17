@@ -1,0 +1,7 @@
+{
+  "maxCapacity": 10,
+  "movies": [
+    {"rank": 9, "title": "war 2", "year": 1901, "duration": 120, "genre": "action/triller/drama"},
+    {"rank": 10, "title": "war 2", "year": 2025, "duration": 196, "genre": "action/triller/drama"}
+  ]
+}

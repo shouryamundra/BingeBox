@@ -1,61 +1,58 @@
+// File: src/movieranker/app/MovieRankerGUI.java
 package movieranker.app;
 
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import movieranker.collection.RankedMovieTreeMap;
 import movieranker.model.Movie;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+public class MovieRankerGUI extends Application {
+    private final RankedMovieTreeMap rankedMovies = new RankedMovieTreeMap(Integer.MAX_VALUE);
+    private final TextArea displayArea = new TextArea();
 
-public class MovieRankerGUI extends JFrame {
-    private final RankedMovieTreeMap rankedMovies = new RankedMovieTreeMap(10);
-    private final JTextArea displayArea = new JTextArea(15, 50);
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("BINGE BOX: Movie Ranker");
 
-    public MovieRankerGUI() {
-        setTitle("Movie Ranker");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout(10, 10));
-        setPreferredSize(new Dimension(700, 500));
+        // Input fields
+        TextField rankField = new TextField();
+        TextField titleField = new TextField();
+        TextField yearField = new TextField();
+        TextField durationField = new TextField();
+        TextField genreField = new TextField();
 
-        // Input panel with BoxLayout
-        JPanel inputPanel = new JPanel();
-        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
-        inputPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        // Layout for input fields
+        VBox inputBox = new VBox(10,
+                createLabeledField("Rank:", rankField),
+                createLabeledField("Title:", titleField),
+                createLabeledField("Year:", yearField),
+                createLabeledField("Duration (min):", durationField),
+                createLabeledField("Genre(s) (comma separated):", genreField)
+        );
+        inputBox.setPadding(new Insets(15));
 
-        JTextField rankField = new JTextField(10);
-        JTextField titleField = new JTextField(20);
-        JTextField yearField = new JTextField(10);
-        JTextField durationField = new JTextField(10);
-        JTextField genreField = new JTextField(20);
-
-        inputPanel.add(createLabeledField("Rank:", rankField));
-        inputPanel.add(createLabeledField("Title:", titleField));
-        inputPanel.add(createLabeledField("Year:", yearField));
-        inputPanel.add(createLabeledField("Duration (min):", durationField));
-        inputPanel.add(createLabeledField("Genre(s) (comma separated):", genreField));
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        JButton addButton = new JButton("Add Movie");
-        JButton saveButton = new JButton("Save");
-        JButton loadButton = new JButton("Load");
-        buttonPanel.add(addButton);
-        buttonPanel.add(saveButton);
-        buttonPanel.add(loadButton);
-
-        inputPanel.add(Box.createVerticalStrut(10));
-        inputPanel.add(buttonPanel);
-
-        add(inputPanel, BorderLayout.NORTH);
+        // Buttons
+        Button addButton = new Button("Add Movie");
+        Button saveButton = new Button("Save");
+        Button loadButton = new Button("Load");
+        HBox buttonBox = new HBox(10, addButton, saveButton, loadButton);
+        buttonBox.setPadding(new Insets(0, 0, 10, 0));
 
         // Display area
         displayArea.setEditable(false);
-        displayArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
-        JScrollPane scrollPane = new JScrollPane(displayArea);
-        scrollPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-        add(scrollPane, BorderLayout.CENTER);
+        displayArea.setStyle("-fx-font-family: 'monospace'; -fx-font-size: 14;");
+        displayArea.setPrefHeight(300);
+
+        // Main layout
+        VBox mainBox = new VBox(10, inputBox, buttonBox, displayArea);
+        mainBox.setPadding(new Insets(20));
 
         // Button actions
-        addButton.addActionListener(e -> {
+        addButton.setOnAction(e -> {
             try {
                 int rank = Integer.parseInt(rankField.getText());
                 String title = titleField.getText();
@@ -66,29 +63,27 @@ public class MovieRankerGUI extends JFrame {
                 rankedMovies.addMovie(rank, new Movie(title, genres, year, duration));
                 updateDisplay();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Invalid input: " + ex.getMessage());
+                showAlert("Invalid input: " + ex.getMessage());
             }
         });
 
-        saveButton.addActionListener(e -> {
-            rankedMovies.saveToFile("src/movieranker/assets/ranked_movies.json");
-        });
-
-        loadButton.addActionListener(e -> {
+        saveButton.setOnAction(e -> rankedMovies.saveToFile("src/movieranker/assets/ranked_movies.json"));
+        loadButton.setOnAction(e -> {
             rankedMovies.loadFromFile("src/movieranker/assets/ranked_movies.json");
             updateDisplay();
         });
 
-        pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
+        Scene scene = new Scene(mainBox, 800, 600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
-    private JPanel createLabeledField(String label, JTextField field) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel.add(new JLabel(label));
-        panel.add(field);
-        return panel;
+    private HBox createLabeledField(String label, TextField field) {
+        Label lbl = new Label(label);
+        lbl.setMinWidth(150);
+        HBox box = new HBox(10, lbl, field);
+        box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        return box;
     }
 
     private void updateDisplay() {
@@ -103,7 +98,12 @@ public class MovieRankerGUI extends JFrame {
         displayArea.setText(sb.toString());
     }
 
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
+        alert.showAndWait();
+    }
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(MovieRankerGUI::new);
+        launch(args);
     }
 }
