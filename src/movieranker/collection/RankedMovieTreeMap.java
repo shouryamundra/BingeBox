@@ -27,6 +27,10 @@ public class RankedMovieTreeMap implements MovieCollection{
         return maxCapacity;
     }
 
+    public Map<Integer, Movie> getRankedMovies() {
+        return rankedMovies;
+    }
+
     private void validateRank(int rank) {
         if (rank < 1 || rank > maxCapacity) {
             throw new IllegalArgumentException("Rank must be between 1 and " + maxCapacity);
