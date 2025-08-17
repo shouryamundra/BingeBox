@@ -20,6 +20,9 @@ public class RankedMovieTreeMap implements MovieCollection{
         this.maxCapacity = maxCapacity;
     }
 
+    public int getMaxCapacity() {
+        return maxCapacity;
+    }
 
     private void validateRank(int rank) {
         if (rank < 1 || rank > maxCapacity) {

@@ -1,16 +1,12 @@
-package movieranker.persistance;
+package movieranker.persistence;
 
 import movieranker.model.Movie;
 
 import java.io.*;
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 
-/**
- * Minimal JSON-like persistence using only core Java.
- * (Not a full JSON library, but enough for this app.)
- */
 public class JSONPersistence {
-
     public static void save(Map<Integer, Movie> movies, String filename, int maxCapacity) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             writer.write("{\n");
