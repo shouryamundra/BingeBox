@@ -8,13 +8,11 @@ public class MovieRankerApp {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        int maxCapacity = 3;
+        int maxCapacity = 1;
         RankedMovieTreeMap rankedMovieTreeMap = new RankedMovieTreeMap(maxCapacity);
 
         System.out.println("🎬 Welcome to Movie Ranker!");
         System.out.println("Enter your top " + maxCapacity + " movies (rank 1 = best).");
-
-        //do-while loop to add movies using scaner, rank iterattion, and try catch
 
         int rank = 1;
         while (rank <= maxCapacity) {
@@ -53,5 +51,7 @@ public class MovieRankerApp {
                 System.out.println(e.getMessage());
             }
         }
+
+        rankedMovieTreeMap.saveToFile("src/movieranker/assets/ranked_movies.json");
     }
 }

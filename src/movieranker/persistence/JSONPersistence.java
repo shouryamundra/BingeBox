@@ -3,12 +3,14 @@ package movieranker.persistence;
 import movieranker.model.Movie;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class JSONPersistence {
-    public static void save(Map<Integer, Movie> movies, String filename, int maxCapacity) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+    public static void save(Map<Integer, Movie> movies, Path filePath, int maxCapacity) {
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
             writer.write("{\n");
             writer.write("  \"maxCapacity\": " + maxCapacity + ",\n");
             writer.write("  \"movies\": [\n");
@@ -29,18 +31,17 @@ public class JSONPersistence {
             writer.write("  ]\n");
             writer.write("}\n");
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to save to file: " + filename, e);
+            throw new IllegalStateException("Failed to save to file: " + filePath, e);
         }
     }
 
-    public static Map<Integer, Movie> load(String filename, int maxCapacity) {
+    public static Map<Integer, Movie> load(Path filePath, int maxCapacity) {
         Map<Integer, Movie> loaded = new TreeMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
                 if (line.startsWith("{\"rank\"")) {
-                    // Very naive parsing (good enough for our simple format)
                     int rank = Integer.parseInt(line.split("\"rank\":")[1].split(",")[0].trim());
                     String title = line.split("\"title\":")[1].split(",")[0].replace("\"", "").trim();
                     int year = Integer.parseInt(line.split("\"year\":")[1].split(",")[0].trim());
@@ -54,7 +55,7 @@ public class JSONPersistence {
                 }
             }
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to load file: " + filename, e);
+            throw new IllegalStateException("Failed to load file: " + filePath, e);
         }
         return loaded;
     }

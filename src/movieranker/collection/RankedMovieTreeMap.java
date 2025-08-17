@@ -1,7 +1,10 @@
 package movieranker.collection;
 
 import movieranker.model.Movie;
+import movieranker.persistence.JSONPersistence;
 
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.TreeMap;
 
 public class RankedMovieTreeMap implements MovieCollection{
@@ -128,15 +131,31 @@ public class RankedMovieTreeMap implements MovieCollection{
 
     @Override
     public void saveToFile(String filename) {
-        // Implementation for saving to file can be added here
-        // This could involve serializing the TreeMap to a file
-        throw new UnsupportedOperationException("Method not implemented yet");
+        if (filename == null || filename.isEmpty()) {
+            throw new IllegalArgumentException("Filename cannot be null or empty");
+        }
+
+        if (filename.equals("default")) {
+            filename = "src/movieranker/assets/ranked_movies.json";
+        }
+
+        if (rankedMovies.isEmpty()) {
+            System.out.println("No movies to save.");
+            return;
+        }
+
+        var filePath = Path.of(filename);
+        // Use JSONPersistence to save the rankedMovies
+        movieranker.persistence.JSONPersistence.save(rankedMovies, filePath, maxCapacity);
+        System.out.println("Movies saved to " + filename);
+
     }
 
     @Override
     public void loadFromFile(String filename) {
-        // Implementation for loading from file can be added here
-        // This could involve deserializing the TreeMap from a file
-        throw new UnsupportedOperationException("Method not implemented yet");
+        var filePath = Path.of(filename);
+        Map<Integer, Movie> loaded = JSONPersistence.load(filePath, maxCapacity);
+        rankedMovies.clear();
+        rankedMovies.putAll(loaded);
     }
 }
