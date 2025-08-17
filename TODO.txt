@@ -1,0 +1,4 @@
+1. The ToString message should have a format like "1 hour, 30 minutes, and 45 seconds".
+2. Do Persistence of the movie details in a local JSON File.
+3. Connect to TMDB API to fetch movie details.
+4. Display the movie details in a user-friendly format using a GUI.
